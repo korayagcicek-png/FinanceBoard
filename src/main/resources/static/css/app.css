@@ -1,0 +1,162 @@
+/* FinanceBoard - Custom Styles */
+
+:root {
+    --fb-sidebar-width: 220px;
+    --fb-transition: 0.15s ease-in-out;
+}
+
+body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background-color: #f8f9fa;
+    color: #212529;
+}
+
+/* Navbar */
+.navbar-brand {
+    font-size: 1.1rem;
+    letter-spacing: -0.01em;
+}
+
+.navbar .nav-link {
+    font-size: 0.9rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 6px;
+    transition: background-color var(--fb-transition);
+}
+
+.navbar .nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+}
+
+.navbar .nav-link.active {
+    background-color: rgba(255, 255, 255, 0.2);
+    font-weight: 600;
+}
+
+/* Cards */
+.card {
+    border-radius: 12px;
+    transition: box-shadow var(--fb-transition);
+}
+
+.card:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.09) !important;
+}
+
+.card-header {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    padding: 1rem 1.25rem 0.75rem;
+}
+
+/* Progress bars */
+.progress {
+    border-radius: 100px;
+    background-color: #e9ecef;
+}
+
+.progress-bar {
+    border-radius: 100px;
+    transition: width 0.4s ease;
+}
+
+/* Tables */
+.table > :not(caption) > * > * {
+    padding: 0.75rem 0.5rem;
+}
+
+/* Badges */
+.badge {
+    font-weight: 500;
+    font-size: 0.75em;
+    letter-spacing: 0.01em;
+}
+
+/* Alert */
+.alert {
+    border-radius: 8px;
+}
+
+/* Buttons */
+.btn {
+    border-radius: 8px;
+    font-size: 0.875rem;
+}
+
+.btn-sm {
+    border-radius: 6px;
+}
+
+/* Forms */
+.form-control, .form-select {
+    border-radius: 8px;
+    border-color: #dee2e6;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
+}
+
+/* Input group */
+.input-group-text {
+    border-radius: 8px 0 0 8px;
+    background-color: #f8f9fa;
+    color: #6c757d;
+}
+
+.input-group > .form-control:last-child {
+    border-radius: 0 8px 8px 0;
+}
+
+/* Main content */
+main {
+    padding-top: 1.5rem !important;
+    padding-bottom: 2rem !important;
+}
+
+/* Heading */
+h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #212529;
+}
+
+/* KPI card icons */
+.rounded-circle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+}
+
+/* Responsive container */
+@media (min-width: 1400px) {
+    .container-fluid {
+        max-width: 1600px;
+    }
+}
+
+/* Footer */
+footer {
+    font-size: 0.8rem;
+}
+
+/* List group */
+.list-group-item {
+    transition: background-color var(--fb-transition);
+}
+
+/* Chart canvas */
+canvas {
+    max-width: 100%;
+}
+
+/* Color dot in categories */
+.color-dot {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    display: inline-block;
+    border: 2px solid rgba(0,0,0,0.1);
+}

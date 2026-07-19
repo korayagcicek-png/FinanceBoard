@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}"
+      lang="en">
+<head>
+    <title th:text="${pageTitle}">Transactions</title>
+</head>
+<body>
+<layout:fragment name="content">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0"><i class="bi bi-arrow-left-right me-2 text-primary"></i>Transactions</h2>
+        <a th:href="@{/transactions/new}" class="btn btn-primary">
+            <i class="bi bi-plus-lg me-1"></i>New Transaction
+        </a>
+    </div>
+
+    <!-- Filters -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+            <form method="get" th:action="@{/transactions}" class="row g-2 align-items-end">
+                <div class="col-auto">
+                    <label class="form-label small mb-1">Month</label>
+                    <select name="month" class="form-select form-select-sm">
+                        <option th:each="m : ${#numbers.sequence(1,12)}"
+                                th:value="${m}"
+                                th:text="${#temporals.format(#temporals.createDate(selectedYear, m, 1), 'MMMM')}"
+                                th:selected="${m == selectedMonth}">
+                        </option>
+                    </select>
+                </div>
+                <div class="col-auto">
+                    <label class="form-label small mb-1">Year</label>
+                    <select name="year" class="form-select form-select-sm">
+                        <option th:each="y : ${#numbers.sequence(selectedYear - 3, selectedYear + 1)}"
+                                th:value="${y}" th:text="${y}" th:selected="${y == selectedYear}">
+                        </option>
+                    </select>
+                </div>
+                <div class="col-auto">
+                    <label class="form-label small mb-1">Category</label>
+                    <select name="categoryId" class="form-select form-select-sm">
+                        <option value="">All Categories</option>
+                        <option th:each="cat : ${categories}"
+                                th:value="${cat.id}" th:text="${cat.name}"
+                                th:selected="${cat.id == selectedCategoryId}">
+                        </option>
+                    </select>
+                </div>
+                <div class="col-auto">
+                    <label class="form-label small mb-1">Type</label>
+                    <select name="type" class="form-select form-select-sm">
+                        <option value="">All Types</option>
+                        <option value="INCOME" th:selected="${selectedType == 'INCOME'}">Income</option>
+                        <option value="EXPENSE" th:selected="${selectedType == 'EXPENSE'}">Expense</option>
+                    </select>
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-sm btn-primary">Filter</button>
+                    <a th:href="@{/transactions}" class="btn btn-sm btn-outline-secondary ms-1">Reset</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-sm-4">
+            <div class="card border-0 bg-success bg-opacity-10 shadow-sm">
+                <div class="card-body text-center py-2">
+                    <div class="text-muted small">Income</div>
+                    <div class="fw-bold text-success"
+                         th:text="'€' + ${#numbers.formatDecimal(totalIncome, 1, 2)}">€0.00</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <div class="card border-0 bg-danger bg-opacity-10 shadow-sm">
+                <div class="card-body text-center py-2">
+                    <div class="text-muted small">Expenses</div>
+                    <div class="fw-bold text-danger"
+                         th:text="'€' + ${#numbers.formatDecimal(totalExpenses, 1, 2)}">€0.00</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <div class="card border-0 shadow-sm"
+                 th:classappend="${totalIncome.subtract(totalExpenses).compareTo(T(java.math.BigDecimal).ZERO) >= 0 ? 'bg-primary bg-opacity-10' : 'bg-warning bg-opacity-10'}">
+                <div class="card-body text-center py-2">
+                    <div class="text-muted small">Net</div>
+                    <div class="fw-bold"
+                         th:classappend="${totalIncome.subtract(totalExpenses).compareTo(T(java.math.BigDecimal).ZERO) >= 0 ? 'text-primary' : 'text-danger'}"
+                         th:text="'€' + ${#numbers.formatDecimal(totalIncome.subtract(totalExpenses), 1, 2)}">€0.00</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Transactions Table -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-0">
+            <div th:if="${transactions.isEmpty()}" class="text-center py-5 text-muted">
+                <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                No transactions found for this period.
+                <div class="mt-2"><a th:href="@{/transactions/new}">Add your first transaction</a></div>
+            </div>
+            <div class="table-responsive" th:unless="${transactions.isEmpty()}">
+                <table class="table table-hover mb-0 align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-3">Date</th>
+                            <th>Description</th>
+                            <th>Category</th>
+                            <th>Type</th>
+                            <th class="text-end">Amount</th>
+                            <th class="text-end pe-3">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="tx : ${transactions}">
+                            <td class="ps-3 text-muted small" th:text="${#temporals.format(tx.date, 'dd MMM yyyy')}">Date</td>
+                            <td>
+                                <div class="fw-semibold" th:text="${tx.description}">Description</div>
+                                <div class="text-muted small" th:if="${tx.notes}" th:text="${tx.notes}"></div>
+                            </td>
+                            <td>
+                                <span th:if="${tx.category}" class="badge rounded-pill text-bg-secondary"
+                                      th:text="${tx.category.name}">
+                                </span>
+                                <span th:unless="${tx.category}" class="text-muted small">—</span>
+                            </td>
+                            <td>
+                                <span class="badge"
+                                      th:classappend="${tx.type.name() == 'INCOME' ? 'bg-success' : 'bg-danger'}"
+                                      th:text="${tx.type.name()}">
+                                </span>
+                            </td>
+                            <td class="text-end fw-semibold"
+                                th:classappend="${tx.type.name() == 'INCOME' ? 'text-success' : 'text-danger'}"
+                                th:text="${(tx.type.name() == 'INCOME' ? '+' : '-') + '€' + #numbers.formatDecimal(tx.amount, 1, 2)}">
+                            </td>
+                            <td class="text-end pe-3">
+                                <a th:href="@{/transactions/{id}/edit(id=${tx.id})}"
+                                   class="btn btn-sm btn-outline-secondary me-1">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <form th:action="@{/transactions/{id}/delete(id=${tx.id})}"
+                                      method="post" class="d-inline"
+                                      onsubmit="return confirm('Delete this transaction?')">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</layout:fragment>
+</body>
+</html>
