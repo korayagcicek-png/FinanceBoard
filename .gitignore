@@ -1,0 +1,22 @@
+# Maven
+target/
+*.class
+
+# H2 database files (local data, not committed)
+data/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+*.classpath
+*.project
+.settings/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Spring Boot
+*.log
+spring.log

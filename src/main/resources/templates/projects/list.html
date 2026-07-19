@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout('Projects - FinanceBoard', ~{::content}, 'projects')}">
+<body>
+<th:block th:fragment="content">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0"><i class="bi bi-kanban me-2 text-primary"></i>Financial Projects</h2>
+        <a th:href="@{/projects/new}" class="btn btn-primary">
+            <i class="bi bi-plus-lg me-1"></i>New Project
+        </a>
+    </div>
+
+    <div th:if="${#lists.isEmpty(projects)}" class="text-center text-muted py-5">
+        <i class="bi bi-kanban fs-1 d-block mb-2 opacity-50"></i>
+        No projects yet. <a th:href="@{/projects/new}">Create your first project</a>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-md-6 col-lg-4" th:each="project : ${projects}">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <h5 class="card-title mb-0" th:text="${project.name}"></h5>
+                        <span th:switch="${project.status.name()}">
+                            <span th:case="'PLANNED'"      class="badge bg-secondary-subtle text-secondary border border-secondary-subtle">Planned</span>
+                            <span th:case="'IN_PROGRESS'"  class="badge bg-warning-subtle text-warning border border-warning-subtle">In Progress</span>
+                            <span th:case="'COMPLETED'"    class="badge bg-success-subtle text-success border border-success-subtle">Completed</span>
+                            <span th:case="'CANCELLED'"    class="badge bg-danger-subtle text-danger border border-danger-subtle">Cancelled</span>
+                        </span>
+                    </div>
+
+                    <p th:if="${project.notes}" class="text-muted small mb-3" th:text="${project.notes}"></p>
+
+                    <!-- Progress bar -->
+                    <div class="mb-2">
+                        <div class="d-flex justify-content-between small mb-1">
+                            <span class="text-muted">Progress</span>
+                            <span class="fw-semibold" th:text="${project.progress} + '%'"></span>
+                        </div>
+                        <div class="progress" style="height:10px">
+                            <div th:class="${project.progressBarClass}"
+                                 th:style="'width:' + ${project.progress} + '%'"
+                                 role="progressbar"></div>
+                        </div>
+                    </div>
+
+                    <div class="row g-2 text-center mt-2">
+                        <div class="col-6" th:if="${project.estimatedCost != null}">
+                            <div class="text-muted small">Est. Cost</div>
+                            <div class="fw-bold" th:text="'$' + ${#numbers.formatDecimal(project.estimatedCost, 1, 2)}"></div>
+                        </div>
+                        <div th:class="${project.estimatedCost != null} ? 'col-6' : 'col-12'" th:if="${project.deadline != null}">
+                            <div class="text-muted small">Deadline</div>
+                            <div class="fw-bold small" th:text="${#temporals.format(project.deadline, 'dd MMM yyyy')}"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-0 pt-0">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <small class="text-muted">
+                            <i class="bi bi-calendar3 me-1"></i>
+                            Added <span th:text="${#temporals.format(project.createdAt, 'dd MMM yyyy')}"></span>
+                        </small>
+                        <div class="d-flex gap-1">
+                            <a th:href="@{/projects/{id}/edit(id=${project.id})}" class="btn btn-sm btn-outline-secondary">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <form th:action="@{/projects/{id}/delete(id=${project.id})}" method="post"
+                                  onsubmit="return confirm('Delete this project?')">
+                                <button class="btn btn-sm btn-outline-danger">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</th:block>
+</body>
+</html>

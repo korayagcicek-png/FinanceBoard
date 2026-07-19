@@ -1,0 +1,79 @@
+/* FinanceBoard - Custom styles */
+
+body {
+    background-color: #f8f9fa;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+/* Navbar */
+.navbar-brand {
+    font-size: 1.2rem;
+    letter-spacing: 0.5px;
+}
+
+/* Cards */
+.card {
+    border-radius: 0.75rem;
+}
+
+.card-header {
+    font-weight: 600;
+}
+
+/* Progress bars */
+.progress {
+    border-radius: 1rem;
+}
+
+.progress-bar {
+    border-radius: 1rem;
+    transition: width 0.5s ease;
+}
+
+/* Tables */
+.table th {
+    font-size: 0.82rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #6c757d;
+    font-weight: 600;
+}
+
+/* Badges */
+.badge {
+    font-weight: 500;
+    font-size: 0.75rem;
+    padding: 0.3em 0.65em;
+}
+
+/* KPI icons */
+.rounded-circle.p-3 {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Form improvements */
+.form-label.fw-semibold {
+    font-size: 0.9rem;
+}
+
+/* Footer */
+footer {
+    font-size: 0.82rem;
+}
+
+/* Alert */
+.alert {
+    border-radius: 0.65rem;
+}
+
+/* Responsive table */
+@media (max-width: 576px) {
+    .table-responsive table td,
+    .table-responsive table th {
+        font-size: 0.82rem;
+    }
+}
