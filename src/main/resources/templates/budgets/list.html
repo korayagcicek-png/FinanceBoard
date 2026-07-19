@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}"
+      lang="en">
+<head>
+    <title th:text="${pageTitle}">Budgets</title>
+</head>
+<body>
+<layout:fragment name="content">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0"><i class="bi bi-wallet2 me-2 text-primary"></i>Budgets</h2>
+        <a th:href="@{/budgets/new}" class="btn btn-primary">
+            <i class="bi bi-plus-lg me-1"></i>New Budget
+        </a>
+    </div>
+
+    <!-- Month/Year selector -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body py-2">
+            <form method="get" th:action="@{/budgets}" class="d-flex gap-2 align-items-center flex-wrap">
+                <span class="text-muted small">Show budgets for:</span>
+                <select name="month" class="form-select form-select-sm" style="width:auto">
+                    <option th:each="m : ${#numbers.sequence(1,12)}"
+                            th:value="${m}"
+                            th:text="${#temporals.format(#temporals.createDate(selectedYear, m, 1), 'MMMM')}"
+                            th:selected="${m == selectedMonth}">
+                    </option>
+                </select>
+                <select name="year" class="form-select form-select-sm" style="width:auto">
+                    <option th:each="y : ${#numbers.sequence(selectedYear - 2, selectedYear + 1)}"
+                            th:value="${y}" th:text="${y}" th:selected="${y == selectedYear}">
+                    </option>
+                </select>
+                <button type="submit" class="btn btn-sm btn-primary">Go</button>
+            </form>
+        </div>
+    </div>
+
+    <div th:if="${budgetWithSpending.isEmpty()}" class="text-center py-5 text-muted">
+        <i class="bi bi-wallet2 fs-1 d-block mb-2"></i>
+        No budgets defined for this period.
+        <div class="mt-2"><a th:href="@{/budgets/new}">Create your first budget</a></div>
+    </div>
+
+    <div class="row g-3" th:unless="${budgetWithSpending.isEmpty()}">
+        <div class="col-md-6 col-lg-4" th:each="entry : ${budgetWithSpending}">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div>
+                            <h6 class="mb-0 fw-semibold" th:text="${entry.key.category.name}">Category</h6>
+                            <span class="text-muted small">
+                                Limit: <span th:text="'€' + ${#numbers.formatDecimal(entry.key.limitAmount, 1, 2)}"></span>
+                            </span>
+                        </div>
+                        <div class="d-flex gap-1">
+                            <a th:href="@{/budgets/{id}/edit(id=${entry.key.id})}"
+                               class="btn btn-sm btn-outline-secondary">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <form th:action="@{/budgets/{id}/delete(id=${entry.key.id})}" method="post" class="d-inline"
+                                  onsubmit="return confirm('Delete this budget?')">
+                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between small mb-1">
+                        <span th:classappend="${entry.value.compareTo(entry.key.limitAmount) > 0 ? 'text-danger fw-bold' : 'text-muted'}">
+                            Spent: <span th:text="'€' + ${#numbers.formatDecimal(entry.value, 1, 2)}"></span>
+                        </span>
+                        <span class="text-muted">
+                            Remaining:
+                            <span th:classappend="${entry.key.limitAmount.subtract(entry.value).compareTo(T(java.math.BigDecimal).ZERO) < 0 ? 'text-danger' : 'text-success'}"
+                                  th:text="'€' + ${#numbers.formatDecimal(entry.key.limitAmount.subtract(entry.value).abs(), 1, 2)}">
+                            </span>
+                        </span>
+                    </div>
+
+                    <div class="progress mb-2" style="height: 10px;">
+                        <div class="progress-bar"
+                             th:classappend="${entry.value.compareTo(entry.key.limitAmount) > 0 ? 'bg-danger' :
+                                             (entry.value.compareTo(entry.key.limitAmount.multiply(T(java.math.BigDecimal).valueOf(0.85))) > 0 ? 'bg-warning' : 'bg-success')}"
+                             th:style="'width: ' + ${T(java.lang.Math).min(100, entry.value.multiply(T(java.math.BigDecimal).valueOf(100)).divide(entry.key.limitAmount, 0, T(java.math.RoundingMode).HALF_UP).intValue())} + '%'">
+                        </div>
+                    </div>
+
+                    <div th:if="${entry.value.compareTo(entry.key.limitAmount) > 0}"
+                         class="alert alert-danger py-1 px-2 mb-0 small">
+                        <i class="bi bi-exclamation-triangle-fill me-1"></i>
+                        Over budget by €<span th:text="${#numbers.formatDecimal(entry.value.subtract(entry.key.limitAmount), 1, 2)}"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</layout:fragment>
+</body>
+</html>

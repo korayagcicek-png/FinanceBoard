@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}"
+      lang="en">
+<head>
+    <title th:text="${pageTitle}">Category Form</title>
+</head>
+<body>
+<layout:fragment name="content">
+
+    <div class="d-flex align-items-center mb-4">
+        <a th:href="@{/categories}" class="btn btn-outline-secondary btn-sm me-3">
+            <i class="bi bi-arrow-left"></i>
+        </a>
+        <h2 class="mb-0" th:text="${pageTitle}">Category</h2>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <form th:action="@{/categories/save}" method="post" th:object="${category}">
+                        <input type="hidden" th:field="*{id}"/>
+
+                        <!-- Name -->
+                        <div class="mb-3">
+                            <label for="name" class="form-label fw-semibold">Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="name" th:field="*{name}"
+                                   th:classappend="${#fields.hasErrors('name') ? 'is-invalid' : ''}"
+                                   placeholder="e.g. Groceries, Salary..."/>
+                            <div class="invalid-feedback" th:errors="*{name}"></div>
+                        </div>
+
+                        <!-- Type -->
+                        <div class="mb-3">
+                            <label for="type" class="form-label fw-semibold">Type <span class="text-danger">*</span></label>
+                            <select class="form-select" id="type" th:field="*{type}">
+                                <option th:each="t : ${types}" th:value="${t}" th:text="${t.name()}"></option>
+                            </select>
+                        </div>
+
+                        <!-- Color -->
+                        <div class="mb-3">
+                            <label for="color" class="form-label fw-semibold">Color</label>
+                            <div class="d-flex align-items-center gap-2">
+                                <input type="color" class="form-control form-control-color" id="color"
+                                       th:field="*{color}" value="#0d6efd" style="width: 60px;"/>
+                                <span class="text-muted small">Used for charts and badges</span>
+                            </div>
+                        </div>
+
+                        <!-- Icon -->
+                        <div class="mb-4">
+                            <label for="icon" class="form-label fw-semibold">Bootstrap Icon</label>
+                            <input type="text" class="form-control" id="icon" th:field="*{icon}"
+                                   placeholder="e.g. bi-cart, bi-house, bi-car-front"/>
+                            <div class="form-text">
+                                Optional. Enter a <a href="https://icons.getbootstrap.com/" target="_blank">Bootstrap Icon</a>
+                                class name (e.g. <code>bi-cart</code>).
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-lg me-1"></i>Save Category
+                            </button>
+                            <a th:href="@{/categories}" class="btn btn-outline-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</layout:fragment>
+</body>
+</html>

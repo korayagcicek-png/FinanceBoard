@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}"
+      lang="en">
+<head>
+    <title th:text="${pageTitle}">Projects</title>
+</head>
+<body>
+<layout:fragment name="content">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0"><i class="bi bi-kanban me-2 text-primary"></i>Financial Projects</h2>
+        <a th:href="@{/projects/new}" class="btn btn-primary">
+            <i class="bi bi-plus-lg me-1"></i>New Project
+        </a>
+    </div>
+
+    <div th:if="${projects.isEmpty()}" class="text-center py-5 text-muted">
+        <i class="bi bi-kanban fs-1 d-block mb-2"></i>
+        No projects defined yet.
+        <div class="mt-2"><a th:href="@{/projects/new}">Create your first project</a></div>
+    </div>
+
+    <div class="row g-3" th:unless="${projects.isEmpty()}">
+        <div class="col-md-6 col-lg-4" th:each="project : ${projects}">
+            <div class="card border-0 shadow-sm h-100"
+                 th:classappend="${project.overBudget ? 'border-start border-danger border-3' : ''}">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div>
+                            <h6 class="mb-1 fw-semibold" th:text="${project.name}">Project Name</h6>
+                            <span class="badge"
+                                  th:classappend="${project.status.name() == 'IN_PROGRESS' ? 'bg-warning text-dark' :
+                                                  (project.status.name() == 'COMPLETED' ? 'bg-success' :
+                                                  (project.status.name() == 'CANCELLED' ? 'bg-danger' : 'bg-secondary'))}"
+                                  th:text="${project.status.name().replace('_', ' ')}">
+                            </span>
+                        </div>
+                        <div class="d-flex gap-1">
+                            <a th:href="@{/projects/{id}/edit(id=${project.id})}"
+                               class="btn btn-sm btn-outline-secondary">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <form th:action="@{/projects/{id}/delete(id=${project.id})}" method="post"
+                                  class="d-inline"
+                                  onsubmit="return confirm('Delete this project?')">
+                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <p th:if="${project.description}" class="small text-muted mb-3"
+                       th:text="${project.description}"></p>
+
+                    <!-- Progress -->
+                    <div class="d-flex justify-content-between small mb-1">
+                        <span class="text-muted">Progress</span>
+                        <span class="fw-semibold" th:text="${project.progressPercent} + '%'">0%</span>
+                    </div>
+                    <div class="progress mb-3" style="height: 10px;">
+                        <div class="progress-bar"
+                             th:classappend="${project.status.name() == 'COMPLETED' ? 'bg-success' : 'bg-warning'}"
+                             th:style="'width: ' + ${project.progressPercent} + '%'">
+                        </div>
+                    </div>
+
+                    <!-- Cost Info -->
+                    <div class="row g-1 small">
+                        <div class="col-6">
+                            <span class="text-muted">Estimated</span>
+                            <div class="fw-semibold"
+                                 th:text="'€' + ${#numbers.formatDecimal(project.estimatedCost, 1, 2)}">
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <span class="text-muted">Actual</span>
+                            <div class="fw-semibold"
+                                 th:classappend="${project.overBudget ? 'text-danger' : 'text-success'}"
+                                 th:text="'€' + ${#numbers.formatDecimal(project.actualCost, 1, 2)}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div th:if="${project.deadline}" class="small text-muted mt-2">
+                        <i class="bi bi-calendar3 me-1"></i>Deadline:
+                        <span th:text="${#temporals.format(project.deadline, 'dd MMM yyyy')}"></span>
+                    </div>
+
+                    <div th:if="${project.overBudget}" class="alert alert-danger py-1 px-2 mb-0 mt-2 small">
+                        <i class="bi bi-exclamation-triangle-fill me-1"></i>
+                        Over budget by €<span th:text="${#numbers.formatDecimal(project.actualCost.subtract(project.estimatedCost), 1, 2)}"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</layout:fragment>
+</body>
+</html>

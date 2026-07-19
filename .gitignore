@@ -1,0 +1,28 @@
+### Maven
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+### H2 Database files (local data - do not commit)
+*.mv.db
+*.trace.db
+
+### IDE
+.idea/
+*.iml
+*.iws
+*.ipr
+.project
+.classpath
+.settings/
+*.sts4-cache
+.vscode/
+
+### OS
+.DS_Store
+Thumbs.db
+
+### Spring Boot
+HELP.md
+spring.log
