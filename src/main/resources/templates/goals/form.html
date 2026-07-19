@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout(${editMode != null and editMode ? 'Edit Goal' : 'New Goal'} + ' - FinanceBoard', ~{::content}, 'goals')}">
+<body>
+<th:block th:fragment="content">
+
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header border-0 bg-transparent">
+                    <h4 class="mb-0">
+                        <i class="bi bi-trophy me-2 text-primary"></i>
+                        <span th:text="${editMode != null and editMode ? 'Edit Goal' : 'New Savings Goal'}"></span>
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form th:action="${editMode != null and editMode ? '/goals/' + form.id + '/edit' : '/goals'}"
+                          th:object="${form}" method="post" novalidate>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Goal Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" th:field="*{name}"
+                                   placeholder="e.g. Emergency Fund"
+                                   th:classappend="${#fields.hasErrors('name')} ? 'is-invalid'">
+                            <div th:if="${#fields.hasErrors('name')}" class="invalid-feedback" th:errors="*{name}"></div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Target Amount <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" class="form-control" th:field="*{targetAmount}"
+                                       step="0.01" min="0.01" placeholder="0.00"
+                                       th:classappend="${#fields.hasErrors('targetAmount')} ? 'is-invalid'">
+                                <div th:if="${#fields.hasErrors('targetAmount')}" class="invalid-feedback"
+                                     th:errors="*{targetAmount}"></div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Current Saved Amount</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" class="form-control" th:field="*{currentAmount}"
+                                       step="0.01" min="0" placeholder="0.00">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Target Date</label>
+                            <input type="date" class="form-control" th:field="*{targetDate}">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Status</label>
+                            <select class="form-select" th:field="*{status}">
+                                <option th:each="s : ${statuses}" th:value="${s.name()}" th:text="${s.name()}"></option>
+                            </select>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">Description</label>
+                            <textarea class="form-control" th:field="*{description}" rows="2"
+                                      placeholder="Optional notes about this goal..."></textarea>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a th:href="@{/goals}" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left me-1"></i>Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-lg me-1"></i>
+                                <span th:text="${editMode != null and editMode ? 'Update Goal' : 'Create Goal'}"></span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</th:block>
+</body>
+</html>

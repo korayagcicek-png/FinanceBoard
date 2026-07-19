@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout('Budgets - FinanceBoard', ~{::content}, 'budgets')}">
+<body>
+<th:block th:fragment="content">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0"><i class="bi bi-wallet2 me-2 text-primary"></i>Budgets</h2>
+        <a th:href="@{/budgets/new}" class="btn btn-primary">
+            <i class="bi bi-plus-lg me-1"></i>Add Budget
+        </a>
+    </div>
+
+    <!-- Month/Year Filter -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body py-3">
+            <form class="row g-2 align-items-end" method="get" th:action="@{/budgets}">
+                <div class="col-auto">
+                    <label class="form-label small text-muted mb-1">Month</label>
+                    <select name="month" class="form-select form-select-sm">
+                        <option th:each="m : ${#numbers.sequence(1,12)}"
+                                th:value="${m}"
+                                th:text="${#temporals.format(#temporals.create(selectedYear, m, 1), 'MMMM')}"
+                                th:selected="${m == selectedMonth}"></option>
+                    </select>
+                </div>
+                <div class="col-auto">
+                    <label class="form-label small text-muted mb-1">Year</label>
+                    <select name="year" class="form-select form-select-sm">
+                        <option th:each="yr : ${#numbers.sequence(currentYear - 2, currentYear + 1)}"
+                                th:value="${yr}" th:text="${yr}"
+                                th:selected="${yr == selectedYear}"></option>
+                    </select>
+                </div>
+                <div class="col-auto">
+                    <button class="btn btn-sm btn-outline-primary" type="submit">
+                        <i class="bi bi-funnel me-1"></i>View
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Budget List -->
+    <div th:if="${#lists.isEmpty(budgetStatuses)}" class="text-center text-muted py-5">
+        <i class="bi bi-wallet2 fs-1 d-block mb-2 opacity-50"></i>
+        No budgets for this month. <a th:href="@{/budgets/new}">Create one</a>
+    </div>
+
+    <div class="row g-3" th:unless="${#lists.isEmpty(budgetStatuses)}">
+        <div class="col-md-6 col-lg-4" th:each="bs : ${budgetStatuses}">
+            <div class="card border-0 shadow-sm h-100"
+                 th:classappend="${bs.overBudget} ? 'border-danger border-opacity-50'">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <h6 class="mb-0 fw-semibold" th:text="${bs.categoryName}"></h6>
+                        <div>
+                            <a th:href="@{/budgets/{id}/edit(id=${bs.budgetId})}"
+                               class="btn btn-sm btn-outline-secondary me-1" title="Edit">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <form th:action="@{/budgets/{id}/delete(id=${bs.budgetId})}" method="post" class="d-inline"
+                                  onsubmit="return confirm('Delete this budget?')">
+                                <button class="btn btn-sm btn-outline-danger" title="Delete">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center mb-1 small">
+                        <span class="text-muted">
+                            Spent: <strong th:class="${bs.overBudget} ? 'text-danger' : ''"
+                                          th:text="'$' + ${#numbers.formatDecimal(bs.spentAmount, 1, 2)}"></strong>
+                        </span>
+                        <span class="text-muted">
+                            Limit: <strong th:text="'$' + ${#numbers.formatDecimal(bs.limitAmount, 1, 2)}"></strong>
+                        </span>
+                    </div>
+
+                    <div class="progress mb-2" style="height:10px">
+                        <div th:class="${bs.progressBarClass}"
+                             th:style="'width:' + ${bs.usagePercentCapped} + '%'"
+                             role="progressbar"
+                             th:title="${#numbers.formatDecimal(bs.usagePercent, 1, 1)} + '% used'"></div>
+                    </div>
+
+                    <div class="d-flex justify-content-between small">
+                        <span th:if="${bs.overBudget}" class="text-danger fw-semibold">
+                            <i class="bi bi-exclamation-triangle-fill me-1"></i>
+                            Over by $<span th:text="${#numbers.formatDecimal(bs.spentAmount.subtract(bs.limitAmount).abs(), 1, 2)}"></span>
+                        </span>
+                        <span th:unless="${bs.overBudget}" class="text-success">
+                            <i class="bi bi-check-circle me-1"></i>
+                            Remaining: $<span th:text="${#numbers.formatDecimal(bs.remaining, 1, 2)}"></span>
+                        </span>
+                        <span class="text-muted" th:text="${#numbers.formatDecimal(bs.usagePercent, 1, 0)} + '%'"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</th:block>
+</body>
+</html>

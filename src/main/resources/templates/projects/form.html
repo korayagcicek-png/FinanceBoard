@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout(${editMode != null and editMode ? 'Edit Project' : 'New Project'} + ' - FinanceBoard', ~{::content}, 'projects')}">
+<body>
+<th:block th:fragment="content">
+
+    <div class="row justify-content-center">
+        <div class="col-md-7 col-lg-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header border-0 bg-transparent">
+                    <h4 class="mb-0">
+                        <i class="bi bi-kanban me-2 text-primary"></i>
+                        <span th:text="${editMode != null and editMode ? 'Edit Project' : 'New Financial Project'}"></span>
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form th:action="${editMode != null and editMode ? '/projects/' + form.id + '/edit' : '/projects'}"
+                          th:object="${form}" method="post" novalidate>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Project Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" th:field="*{name}"
+                                   placeholder="e.g. Kitchen Renovation"
+                                   th:classappend="${#fields.hasErrors('name')} ? 'is-invalid'">
+                            <div th:if="${#fields.hasErrors('name')}" class="invalid-feedback" th:errors="*{name}"></div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Estimated Cost</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" class="form-control" th:field="*{estimatedCost}"
+                                       step="0.01" min="0" placeholder="0.00">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Deadline</label>
+                            <input type="date" class="form-control" th:field="*{deadline}">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">
+                                Progress: <span id="progressLabel" th:text="${form.progress} + '%'"></span>
+                            </label>
+                            <input type="range" class="form-range" th:field="*{progress}"
+                                   min="0" max="100" step="5"
+                                   oninput="document.getElementById('progressLabel').textContent = this.value + '%'">
+                            <div th:if="${#fields.hasErrors('progress')}" class="text-danger small" th:errors="*{progress}"></div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Status</label>
+                            <select class="form-select" th:field="*{status}">
+                                <option th:each="s : ${statuses}" th:value="${s.name()}"
+                                        th:text="${#strings.replace(s.name(), '_', ' ')}"></option>
+                            </select>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">Notes / Status Description</label>
+                            <textarea class="form-control" th:field="*{notes}" rows="3"
+                                      placeholder="Additional notes, current status, next steps..."></textarea>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a th:href="@{/projects}" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left me-1"></i>Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-lg me-1"></i>
+                                <span th:text="${editMode != null and editMode ? 'Update Project' : 'Create Project'}"></span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</th:block>
+</body>
+</html>
